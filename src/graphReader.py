@@ -16,8 +16,8 @@ graphReader.next()
 
 while nodeRead:
 	row = graphReader.next()
-	nodeRead = (len(row) == 5)
 	nodeDictionary[row[0]] = row[1]
+	nodeRead = (len(row) == 5)
 print nodeDictionary
 
 graphFile.close()

@@ -4,30 +4,33 @@ import heapq
 import os
 
 class Nodo (object):
-	def __init__(self, id_nodo):
+	def __init__(self, id_nodo, label):
 		
 		self.id_nodo = id_nodo
-		
+		self.label = label
 		"""aristas adyacentes al nodo"""
+		#TODO ordenar por destino
 		self.aristas_ad = []
 		
 		"""atrubuto que se utiliza para la funcion prim"""
 		self.visitado = False
-		
-		"""atributo para no tomar en cuenta al nodo cuando se use la
-		funcion prim"""
-		self.restringido = False
+	def __str__(self):
+		return "id: " + self.id_nodo +" - Label: "+self.label
+	
+	def get_id(self):
+		return self.id_nodo
 	
 class Arista (object):
 	def __init__(self, origen, destino):
 		
 		""" origen y destino son dos variables de la clase nodo """
+		"""TODO intentar no usar origen"""
 		self.origen = origen
+		
 		self.destino = destino
 		
 		""" peso ponderado """
-		self.peso = 0
-		
+		self.peso = 1
 		
 		self.restringida = False
 		
@@ -44,21 +47,32 @@ class Arista (object):
 			return -1
 		else:
 			return 0
+	
+	def	get_peso(self):
+		return self.peso
+	
+	
 
 class Grafo (object):
 	
 	def __init__(self):
+		self.no_dirigido = True
 		""" diccionario que guardará a todos los nodos que contenga el
 		grafo """
 		self.dicc_nodos = {}	
 		
 		self.dicc_cam_min = {}
-	""" recive al id_nodo ,crea un Nodo y lo agrega a los nodos que 
+	def __str__(self):
+		string =""
+		for nodo in self.dicc_nodos.itervalues():
+			string += nodo.__str__()
+			string += '\n'
+			print nodo
+		return string
+	""" recive la instancia del nodo y lo agrega a los nodos que 
 	contiene el grafo """
-	def ingresar_nodo(self, id_nodo):
-		
-		nodo = Nodo(id_nodo)
-		self.dicc_nodos[id_nodo] = nodo
+	def ingresar_nodo(self, nodo):
+		self.dicc_nodos[nodo.get_id()] = nodo
 		
 	"""crea una arista y la mete en su correspondiente nodo
 	pre: los nodos tiene que estar creados"""
@@ -68,36 +82,26 @@ class Grafo (object):
 		nodo_origen = self.dicc_nodos[id_origen]
 		
 		arista = Arista(nodo_origen, nodo_destino)
-		
 		nodo_origen.aristas_ad.append(arista)
-				
+		if(self.no_dirigido):
+			arista2 = Arista(nodo_origen, nodo_destino)
+			nodo_destino.aristas_ad.append(arista2)
 				
 	
 	""" carga el peso en una arista previamente creada """
 	def cargar_peso_arista(self, id_origen, id_destino, peso):
+		#TODO BUSQUEDA BINARIA
 		for ar in self.dicc_nodos[id_origen].aristas_ad:
 			if ar.destino.id_nodo == id_destino:
 				ar.peso = int(peso)
 				break
-		
-	""" devuelve una lista de los ids de los vecinos que tiene un
-	nodo dado y que no estan restringidos """
-	def vecinos_no_restringidos(self, nodo_id):
-		lista_vecinos = []
-		nodo = self.dicc_nodos[nodo_id]
-		
-		for arista in nodo.aristas_ad:
-			if arista.destino.restringido == False:
-				lista_vecinos.append(arista.destino.id_nodo)
-		
-		return lista_vecinos
-		
-		
+				
 	""" dado un id_origen y un id_destino se busca y devuelve la arista
 	que tenga origen en id_origen y destino en id_destino
 	pre: arista buscada debe existir """
 	def arista(self, id_origen, id_destino):
 		nodo = self.dicc_nodos[id_origen]
+		#TODO busqueda binaria->hay que ordenar aristas por destino
 		for arista in nodo.aristas_ad:
 			if arista.destino.id_nodo == id_destino:
 				return arista
@@ -259,13 +263,12 @@ def cargar_datos(nombre_archivo, grafo, modo):
 	archivo.close()
 
 
-def tomar_opcion_camino():
-	print '¿Que desea hacer?'
-	print "'1' para buscar camino mas rapido"
-	print "'2' para buscar camino mas confiable"
-	print "'3' para buscar el camino con menos agentes involucrados"
-	print "'4' para mostrar arbol tendido minimo de tiempo"
-	print "'5' para mostrar arbol tendido minimo de confianza"
+def tomar_opcion_menu():
+	print "Que desea hacer?"
+	print "'1' para buscar mas popular"
+	print "'2' para buscar el amigo mas influyente"
+	print "'3' para que te recomendemos un nuevo amigo "
+	
 	print "'0' Para salir"
 	while True:
 		try:
@@ -276,77 +279,6 @@ def tomar_opcion_camino():
 		except:
 			pass
 	return opcion
-
-
-""" devuelve una tupla de ids (origen,destino) que sera el origen y
-destino en el grafo """
-def tomar_origen_destino(dicc_nombre_id):
-	print"para agente emisor"
-	origen = tomar_agente (dicc_nombre_id)
-	print "para agente receptor"
-	destino = tomar_agente (dicc_nombre_id)
-	
-	return origen,destino
-
-
-def tomar_agente (dicc_nombre_id):
-	while True:
-		try:
-			nombre = raw_input('ingrese nombre del agente ')
-			id = dicc_nombre_id[nombre]
-			break
-			
-		except:
-			print "ingrese agente valido"
-			pass
-	return id
-
-
-"""crea dos diccionarios a partir del archivo que contiene a los agentes
-un diccionario sera dicc_id_nombre[id] = nombre y el otro lo opuesto """
-def crear_dicc_agentes(nombre_archivo):
-	
-	dicc_id_nombre = {}
-	dicc_nombre_id = {}
-	
-	archivo = open(nombre_archivo)
-	lineas = procesar_lineas_archivo(archivo)
-	
-	for linea in lineas:
-		dicc_id_nombre[linea[0]] = linea[1]+" "+linea[2]
-		dicc_nombre_id[linea[1]+" "+linea[2]] = linea[0]
-	
-	archivo.close()
-	return dicc_id_nombre,dicc_nombre_id
-
-
-""" recive por parte del usuario el peso maximo que se permitirá 
-de las aristas en el grafo si no se quiere ingresar un peso maximo
-se devuelce peso maximo infinito"""
-def tomar_peso_maximo():
-	
-	opcion = raw_input("desea asignar un maximo tiempo/confianza si/no ")
-	if opcion == "no":
-		return float("inf")
-		
-	peso = raw_input("ingrese tiempo/confianza maxima entre agentes: ")
-	return int(peso)
-	
-	
-""" recibe por parte del usuario los nodos por los cuales no se pasará
-en el grafo """
-def tomar_nodos_excluir(dicc_nombre_id):
-	
-	lista_negra = []
-	while True:
-		opcion = raw_input("desea agregar un agente a la lista negra si/no ")
-		
-		if opcion == "no":
-			break
-		
-		lista_negra.append(tomar_agente(dicc_nombre_id))
-	return lista_negra
-
 
 """ informa al usuario si hay camino o no, en el caso de haber camino
 usando el dicc_id_nombre pasa de los ids a los nombres de los agentes
@@ -400,76 +332,24 @@ def arbol_tend_min(grafo_nodos, origen, dicc_id_nombre, peso_max):
 
 def main():
 	
-	print "formato esperado 1er archivo:  id nombre apellido "
-	#nombre_archivo1 = tomar_nombre_archivo()
-	print "formato esperado 2do archivo: id1 id2 confianza tiempo "
-	#nombre_archivo2 = tomar_nombre_archivo()
-	
-	nombre_archivo1 = "agentes"
-	nombre_archivo2 = "caminos"
-	
-	dicc_id_nombre, dicc_nombre_id = crear_dicc_agentes(nombre_archivo1)
-	
-	grafo_tiempo = Grafo() #para mejor tiempo
-	grafo_confianza = Grafo() #para camino mas confiable
-	# para recorrido por min cant de nodos implicados
-	grafo_nodos = Grafo()
-	
-	cargar_datos(nombre_archivo1, grafo_nodos, "agentes")
-	cargar_datos(nombre_archivo2, grafo_nodos, "nodos")
-	
-	cargar_datos(nombre_archivo1, grafo_confianza, "agentes")
-	cargar_datos(nombre_archivo2, grafo_confianza, "confianza")
-	
-	cargar_datos(nombre_archivo1, grafo_tiempo, "agentes")
-	cargar_datos(nombre_archivo2, grafo_tiempo, "tiempo")
-	
-	peso_maximo = tomar_peso_maximo()
-	lista_negra = tomar_nodos_excluir(dicc_nombre_id)
-	
-	#aplico restricciones de los nodos que el usuario no quiere pasar por
-	grafo_tiempo.aplicar_restricciones_nodo(lista_negra)
-	grafo_confianza.aplicar_restricciones_nodo(lista_negra)
-	grafo_nodos.aplicar_restricciones_nodo(lista_negra)
-	
-	
-	distancia1, camino_minimo1 = floyd(grafo_confianza, peso_maximo)
-	distancia2, camino_minimo2 = floyd(grafo_tiempo, peso_maximo)
-	""" no se tomará el peso maximo en este caso """
-	distancia3, camino_minimo3 = floyd(grafo_nodos, None)
+	grafo = Grafo() #para mejor tiempo
 	
 	
 	
-	opcion = tomar_opcion_camino()
+	
+	#distancia1, camino_minimo1 = floyd(grafo_confianza, peso_maximo)
+	#distancia2, camino_minimo2 = floyd(grafo_tiempo, peso_maximo)
+	
+	opcion = 1
 	while opcion != 0 :
+		opcion = tomar_opcion_menu()
+		if opcion == 1:
+			print "ha elegido buscar el amigo mas popular"	
 		
-		if opcion == 4:
-			origen = tomar_agente(dicc_nombre_id)
-			arbol_tend_min(grafo_tiempo, origen, dicc_id_nombre, peso_maximo)
+		elif opcion == 2:
+			print "ha elegido buscar el amigo mas influyente"
+				
+		elif opcion == 3:
+			print "ha"
 			
-		elif opcion == 5:
-			origen = tomar_agente(dicc_nombre_id)
-			arbol_tend_min(grafo_confianza, origen, dicc_id_nombre, peso_maximo)
-				
-		else:
-			origen, destino = tomar_origen_destino(dicc_nombre_id)
-			
-			if opcion == 1:
-				
-				camino = camino_minimo1[origen][destino]
-				imprimir_camino(camino, dicc_id_nombre, destino)
-				
-			elif opcion == 2:
-				
-				camino = camino_minimo2[origen][destino]
-				imprimir_camino(camino, dicc_id_nombre, destino)
-				
-			elif opcion == 3:
-				camino = camino_minimo3[origen][destino]
-				imprimir_camino(camino, dicc_id_nombre, destino)
-			
-		
-		opcion = tomar_opcion_camino()
-			
-	
-main()
+
