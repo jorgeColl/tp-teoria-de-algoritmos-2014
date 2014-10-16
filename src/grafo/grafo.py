@@ -15,10 +15,17 @@ class Nodo (object):
 		"""atrubuto que se utiliza para la funcion prim"""
 		self.visitado = False
 	def __str__(self):
-		return "id: " + self.id_nodo +" - Label: "+self.label
+		result = "id: " + self.id_nodo +" - Label: "+self.label
+		result += "Aristas: "
+		for arista in self.aristas_ad:
+			result += str(arista) + " - "
+		return result
 	
 	def get_id(self):
 		return self.id_nodo
+	
+	def get_vecinos(self):
+		return self.aristas_ad
 	
 class Arista (object):
 	def __init__(self, origen, destino):
@@ -329,7 +336,13 @@ def arbol_tend_min(grafo_nodos, origen, dicc_id_nombre, peso_max):
 		
 		print agente_origen,"->",agente_recept
 
-
+def masPopular(grafo):
+	nodo_max = Nodo("nadie","nadie")
+	for nodo in grafo.dicc_nodos.itervalues():
+		if(len(nodo_max.get_vecinos())<len(nodo.get_vecinos())):
+			nodo_max = nodo
+		
+	return nodo_max
 def main():
 	
 	grafo = Grafo() #para mejor tiempo
