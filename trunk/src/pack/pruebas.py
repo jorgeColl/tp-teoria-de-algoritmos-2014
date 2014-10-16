@@ -8,6 +8,7 @@ Created on 14/10/2014
 import csv
 import unittest
 import grafo
+from grafo.grafo import masPopular
 
 class Test(unittest.TestCase):
 
@@ -40,7 +41,12 @@ class Test(unittest.TestCase):
             nodeRead = (len(row) == 5)
             nodo = grafo.Nodo(row[0],row[1]) 
             red.ingresar_nodo(nodo)
+        for row in graphReader:
+            red.ingresar_arista(row[0], row[1])
         print red
+        print "mas amigasooooooooo"
+        amigazo = masPopular(red)
+        print amigazo
             
         # print nodeDictionary
         
