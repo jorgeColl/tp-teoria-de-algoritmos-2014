@@ -23,9 +23,20 @@ class Test(unittest.TestCase):
         maspopular = masPopular(red)
         self.assertEqual(maspopular.getId(),"5" ,maspopular.getLabel())
     
-    def testMasInfluyente(self):
+    def testMasInfluyente1(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
+        nodoMasInfluyente = masInfluyente(red)
+        self.assertEqual(nodoMasInfluyente.getLabel(), "JUAN", "no coinciden los mas inlfuyentes")
+    
+    def testMasInfluyente2(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
+        nodoMasInfluyente = masInfluyente(red)
+        self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS", "no coinciden los mas inlfuyentes")
+        
+    def testMasInfluyente3(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
         nodoMasInfluyente = masInfluyente(red)
+        #TODAVIA TENGO QUE HACER LA CUENTA DE SI ESTA BIEN EL RESULTADO
         print nodoMasInfluyente
                 
     

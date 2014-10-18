@@ -239,7 +239,7 @@ def masInfluyente(grafo):
 		caminosMinimosDesdeNodo = grafo.dijkstra(nodo)
 		for camino in caminosMinimosDesdeNodo.itervalues():
 			#ACA ESTOY CONTANDO DE MAS AL PRIMERO
-			for nodo in camino:
+			for nodo in camino[1:]:
 				nodo.cantVecesUsado+=1
 	nodoMasInfluyente=Nodo("nadie","nadie")
 	for nodo in nodos:
