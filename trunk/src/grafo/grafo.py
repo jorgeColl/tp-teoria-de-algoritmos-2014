@@ -11,8 +11,9 @@ class Nodo (object):
 		#TODO ordenar por destino
 		self.aristas_ad = []
 		self.distanciaAcumulada = float("inf")
-		##self.distanciaAcumulada = 999.0
 		self.visitado = False
+		#cantidad de veces que pasan por el nodo
+		self.cantVecesUsado = 0
 
 	def __str__(self):
 		result = "id: " + self.id_nodo +" - Label: "+self.label+"- Visitado: "+str(self.visitado)+"\n"
@@ -42,7 +43,7 @@ class Arista (object):
 	def __str__(self):
 		return "[origen:"+ str(self.origen.getLabel()) +" destino:"+str(self.destino.getLabel())+" ]"
 	
-	""" se utilizará el cmp para el heap """
+	""" se utiliza el cmp para el heap """
 	def __cmp__(self, arista2):
 		
 		if (self.peso > arista2.peso):
@@ -61,17 +62,18 @@ class Grafo (object):
 	
 	def __init__(self):
 		self.no_dirigido = True
-		""" diccionario que guardará a todos los nodos que contenga el
+		""" diccionario que guarda a todos los nodos que contenga el
 		grafo """
 		self.dicc_nodos = {}	
-		
 		self.dicc_cam_min = {}
+		
 	def __str__(self):
 		string =""
 		for nodo in self.dicc_nodos.itervalues():
 			string += str(nodo)
 			string += '\n'
 		return string
+	
 	""" recive la instancia del nodo y lo agrega a los nodos que 
 	contiene el grafo """
 	def ingresar_nodo(self, nodo):
@@ -181,7 +183,6 @@ class Grafo (object):
 						"""
 						camino[arista.destino.getId()] = list(camino[vertice.getId()])
 						camino[arista.destino.getId()].append (vertice)
-						
 						"""
 						print"camino queda: ",
 						for vert in camino[arista.destino.getId()]:
@@ -190,7 +191,7 @@ class Grafo (object):
 						"""
 					lista.append(arista.destino)
 		return camino
-			
+	
 
 def floyd (grafo):
 	distancia = {}
@@ -232,7 +233,19 @@ def masPopular(grafo):
 
 """ devuelve el nodo que tiene mas caminos minimos que pasan por el que el resto"""
 def masInfluyente(grafo):
-	pass
+	camino = list()
+	nodos = grafo.dicc_nodos.itervalues()
+	for nodo in nodos:
+		caminosMinimosDesdeNodo = grafo.dijkstra(nodo)
+		for camino in caminosMinimosDesdeNodo.itervalues():
+			#ACA ESTOY CONTANDO DE MAS AL PRIMERO
+			for nodo in camino:
+				nodo.cantVecesUsado+=1
+	nodoMasInfluyente=Nodo("nadie","nadie")
+	for nodo in nodos:
+		if(nodoMasInfluyente.cantVecesUsado < nodo.canVecesUsado):
+			nodoMasInfluyente = nodo
+	return nodo
 		
 		
 	
