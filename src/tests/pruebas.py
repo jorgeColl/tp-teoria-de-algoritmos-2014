@@ -7,6 +7,13 @@ import unittest
 import main
 from grafo.grafo import masPopular
 
+def printCamino (red,nodoOrigen,camino):
+    for nodoId in camino:
+        print "De:"+nodoOrigen.getLabel()+" hacia: "+red.getNodo(nodoId).getLabel()
+        for vert in camino[nodoId]:
+            print vert.getLabel()+" -> ",
+        print red.getNodo(nodoId).getLabel()
+        print ""
 
 class Test(unittest.TestCase):
 
@@ -22,10 +29,13 @@ class Test(unittest.TestCase):
     def testMasPopular(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
         maspopular = masPopular(red)
-        self.assertEqual(maspopular.get_id(),"1" ,maspopular.getLabel())
+        self.assertEqual(maspopular.getId(),"1" ,maspopular.getLabel())
     
     def testMasInfluyente(self):
-        pass
+        red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
+        nodo = red.getNodo("1")
+        camino = red.dijkstra(nodo)
+        printCamino(red, nodo, camino)
     
     def testSujerirAmigo(self):
         pass

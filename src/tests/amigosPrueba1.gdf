@@ -2,6 +2,12 @@
 2,Domino Sc,,es_LA,92
 3,Francisco Almeyra,male,en_GB,9
 4,Angela Ch M,female,es_LA,90
+5,PEPE,female,es_LA,90
+6,JUAN,female,es_LA,90
+7,TOMAS,female,es_LA,90
 1,2
 1,4
 2,3
+3,5
+5,6
+6,7

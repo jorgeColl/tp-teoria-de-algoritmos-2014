@@ -21,7 +21,7 @@ class Nodo (object):
 			result += str(arista) + " - "
 		return result
 	
-	def get_id(self):
+	def getId(self):
 		return self.id_nodo
 	
 	def getLabel(self):
@@ -75,7 +75,7 @@ class Grafo (object):
 	""" recive la instancia del nodo y lo agrega a los nodos que 
 	contiene el grafo """
 	def ingresar_nodo(self, nodo):
-		self.dicc_nodos[nodo.get_id()] = nodo
+		self.dicc_nodos[nodo.getId()] = nodo
 		
 	def getNodo(self,nodo_id):
 		return self.dicc_nodos[nodo_id]
@@ -148,28 +148,46 @@ class Grafo (object):
 	""" determina el camino mas corto dado un vertice origen 
 	al resto de vertices en un grafo con pesos en cada arista."""
 	def dijkstra(self,nodo):
-		"""pone todos como no visitados"""
+		"""pone todos como no visitados y distancia en infinito"""
 		self.inicializar_en_0()
 		camino = {}
-		camino[nodo]=list()
-		camino[nodo].append(nodo)
+		camino[nodo.getId()]=list()
 		nodo.distanciaAcumulada = 0
 		lista = list()
 		lista.append(nodo)
+		
 		while len(lista)>0 :
 			vertice = lista.pop(0)
-			#print vertice
+			#print "vertice:"+vertice.getLabel()
 			vertice.visitado = True
 			for arista in vertice.getVecinos():
-				#print arista.destino
+				#print "destino:"+arista.destino.getLabel()
 				if ( arista.destino.visitado == False ):
 					distanciaVecinoOrigenDesdeVertice = vertice.distanciaAcumulada + arista.getPeso()
 					distanciaVecinoOrigenDesdeVecino = arista.destino.distanciaAcumulada
 					if distanciaVecinoOrigenDesdeVertice < distanciaVecinoOrigenDesdeVecino:
 						arista.destino.distanciaAcumulada = distanciaVecinoOrigenDesdeVertice
-						camino[arista.destino] = camino[vertice]
-						camino[arista.destino].append (vertice)
-					#print "se agrega a: "+str(arista.destino.getLabel())
+						"""print "camino de vertice: ",
+						for vert in camino[vertice.getId()]:
+							print vert.getLabel()+" -> ",
+						print ""
+						print "camino anterior: ",
+						if(camino.has_key(arista.destino.getId())):
+							for vert in camino[arista.destino.getId()]:
+								print vert.getLabel()+" -> ",
+							print ""
+						else:
+							print "no habia camino"
+						"""
+						camino[arista.destino.getId()] = list(camino[vertice.getId()])
+						camino[arista.destino.getId()].append (vertice)
+						
+						"""
+						print"camino queda: ",
+						for vert in camino[arista.destino.getId()]:
+							print vert.getLabel()+" -> ",
+						print ""
+						"""
 					lista.append(arista.destino)
 		return camino
 			
