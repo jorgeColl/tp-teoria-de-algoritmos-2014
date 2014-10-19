@@ -47,8 +47,21 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "Juana", "no coinciden los mas inlfuyentes se obtuvo: "+nodoMasInfluyente.getLabel())
-
-            
+        """segun el mail, los caminos minimos son:
+        En total hay 132 caminos mínimos
+        Por cada persona pasan la siguiente cantidad de caminos mínimos:
+        Juana: 38
+        Roberto: 38
+        Carlos: 22
+        Esteban: 16
+        Milena: 10
+        Monica: 10
+        Pablo: 4
+        Nora: 0
+        Lorena: 0
+        Brenda: 0
+        Tomas: 0
+        """
     def testMasInfluyente4(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
         nodoMasInfluyente = masInfluyente(red)

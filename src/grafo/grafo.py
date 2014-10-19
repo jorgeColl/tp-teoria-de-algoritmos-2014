@@ -213,6 +213,8 @@ def masInfluyente(grafo):
 	
 	nodoMasInfluyente=Nodo("nadie","nadie")
 	for nodo in grafo.dicc_nodos.itervalues():
+		#print de debugeo para mostrar que la cantidad de caminos minimos difiere de 
+		#los del mail
 		print nodo.getLabel()+" : "+str(nodo.cantVecesUsado)
 		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
 			nodoMasInfluyente = nodo
