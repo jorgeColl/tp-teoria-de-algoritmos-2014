@@ -29,11 +29,13 @@ class Test(unittest.TestCase):
         self.assertEqual(nodoMasPopular.getLabel(), "Juana", "no coinciden los mas inlfuyentes, lo obtenido fue "+nodoMasPopular.getLabel())
         
     def testMasInfluyente1(self):
+        print "amigosPrueba2.gdf"
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "JUAN", "no coinciden los mas inlfuyentes")
     
     def testMasInfluyente2(self):
+        print "amigosPrueba3.gdf"
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS", "no coinciden los mas inlfuyentes")
@@ -41,6 +43,7 @@ class Test(unittest.TestCase):
     def testMasInfluyente3(self):
         #este test corrobora lo que mandaron por mail del resultado del ejercicio de ejemplo en
         # el enunciado del tp
+        print "amigosPruebaEnunciadoTp.gdf"
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "Juana", "no coinciden los mas inlfuyentes se obtuvo: "+nodoMasInfluyente.getLabel())
