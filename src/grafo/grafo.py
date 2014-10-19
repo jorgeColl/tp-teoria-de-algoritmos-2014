@@ -233,19 +233,18 @@ def masPopular(grafo):
 
 """ devuelve el nodo que tiene mas caminos minimos que pasan por el que el resto"""
 def masInfluyente(grafo):
-	camino = list()
-	nodos = grafo.dicc_nodos.itervalues()
-	for nodo in nodos:
+	for nodo in grafo.dicc_nodos.itervalues():
 		caminosMinimosDesdeNodo = grafo.dijkstra(nodo)
 		for camino in caminosMinimosDesdeNodo.itervalues():
 			#ACA ESTOY CONTANDO DE MAS AL PRIMERO
 			for nodo in camino[1:]:
 				nodo.cantVecesUsado+=1
+	
 	nodoMasInfluyente=Nodo("nadie","nadie")
-	for nodo in nodos:
-		if(nodoMasInfluyente.cantVecesUsado < nodo.canVecesUsado):
+	for nodo in grafo.dicc_nodos.itervalues():
+		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
 			nodoMasInfluyente = nodo
-	return nodo
+	return nodoMasInfluyente
 		
 		
 	
