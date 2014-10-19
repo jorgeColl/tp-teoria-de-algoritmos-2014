@@ -12,6 +12,7 @@ class Nodo (object):
 		self.aristas_ad = []
 		self.distanciaAcumulada = float("inf")
 		self.visitado = False
+		self.restringido = False
 		#cantidad de veces que pasan por el nodo
 		self.cantVecesUsado = 0
 
@@ -117,9 +118,10 @@ class Grafo (object):
 	
 	"""	inicializa todos los nodos del grafo como no visitados """
 	def inicializar_en_0(self):	
-		for id_nodo in self.dicc_nodos:
-			self.dicc_nodos[id_nodo].visitado = False
-			self.dicc_nodos[id_nodo].distanciaAcumulada = float("inf")
+		for nodo in self.dicc_nodos.itervalues():
+			nodo.visitado = False
+			nodo.distanciaAcumulada = float("inf")
+			nodo.cantVecesUsado = 0
 	
 	def prim(self, id_origen, peso_max):
 		""" devuelve una lista de aristas """	
@@ -191,37 +193,6 @@ class Grafo (object):
 						"""
 					lista.append(arista.destino)
 		return camino
-	
-
-def floyd (grafo):
-	distancia = {}
-	camino = {}
-	
-	for id1 in grafo.dicc_nodos :
-		distancia[id1] = {}
-		camino[id1] = {}
-		
-		for id2 in grafo.dicc_nodos:
-			arista = grafo.buscarArista(id1,id2)
-			if arista.getPeso() <= float("inf"):
-				distancia[id1][id2] = arista.getPeso()
-				camino[id1][id2] = [id1]
-			else:
-				distancia[id1][id2] = float("inf")
-				camino[id1][id2] = []
-				
-		distancia[id1][id1] = 0
-		
-
-	for A in grafo.dicc_nodos:
-		for B in grafo.dicc_nodos:
-			for C in grafo.dicc_nodos:
-				if distancia[B][C] > distancia[B][A] + distancia[A][C]:
-					distancia[B][C] = distancia[B][A] + distancia[A][C]
-					camino[B][C] = camino[B][A] + camino[A][C] 
-					
-	return distancia, camino
-
 
 """ devuelve el nodo que tiene mas conecciones con los otros nodos dentro del grafo"""
 def masPopular(grafo):
@@ -242,6 +213,7 @@ def masInfluyente(grafo):
 	
 	nodoMasInfluyente=Nodo("nadie","nadie")
 	for nodo in grafo.dicc_nodos.itervalues():
+		print nodo.getLabel()+" : "+str(nodo.cantVecesUsado)
 		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
 			nodoMasInfluyente = nodo
 	return nodoMasInfluyente
