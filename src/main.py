@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Created on 14/10/2014
 
@@ -5,7 +6,7 @@ Created on 14/10/2014
 '''
 import grafo
 import csv
-from grafo.grafo import masPopular, masInfluyente
+from grafo.grafo import masPopular, masInfluyente, recomendaciones
 
 def cargarRedDesdeArchivo(nombreArchivo):
     red = grafo.Grafo()
@@ -57,7 +58,9 @@ def main():
             print amigoMasInfluyente
                 
         elif opcion == 3:
-            print "ha elegido que le sujiriesemos un nuevo amigo"
-            
-#main()
+            print "ha elegido que armemos una lista de sugerencias"
+            listaRecomendaciones = recomendaciones(red)
+            for item in listaRecomendaciones:
+                print "{0}: {1} ({2} amigos en comun)".format(item[0], item[1], item[2])
+main()
     

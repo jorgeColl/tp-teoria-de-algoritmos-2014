@@ -1,7 +1,6 @@
 #!usr/bin/env python
 #encoding:windows-1251
 import heapq
-from dns.rdatatype import NULL
 
 class Nodo (object):
 	def __init__(self, id_nodo, label):
@@ -22,6 +21,9 @@ class Nodo (object):
 		for arista in self.aristas_ad:
 			result += str(arista) + " - "
 		return result
+
+	def __hash__(self):
+		return self.id_nodo.__hash__()
 	
 	def getId(self):
 		return self.id_nodo
@@ -31,7 +33,7 @@ class Nodo (object):
 	
 	def getVecinos(self):
 		return self.aristas_ad
-	
+
 class Arista (object):
 	def __init__(self, origen, destino):
 		
@@ -57,7 +59,10 @@ class Arista (object):
 	
 	def	getPeso(self):
 		return self.peso
-	
+
+	#Este debería ser el cmp?
+	def igual(self, other):
+		return (self.origen == other.origen and self.destino == other.destino)
 
 class Grafo (object):
 	
@@ -114,7 +119,7 @@ class Grafo (object):
 		for arista in nodo.aristas_ad:
 			if arista.destino.id_nodo == id_destino:
 				return arista
-		return Arista(NULL,NULL)
+		return Arista(None, None)
 	
 	"""	inicializa todos los nodos del grafo como no visitados """
 	def inicializar_en_0(self):	
@@ -194,6 +199,46 @@ class Grafo (object):
 					lista.append(arista.destino)
 		return camino
 
+	#Esto es O(n) en memoria y O(n . A2) en cpu?
+	def vecinosRecomendados(self):
+		todos = list(self.dicc_nodos.values())
+		#Esta matriz tiene en x la persona a quién se le va a recomendar, y en Y
+		#un contador para ver quién conviene recomendar
+		vectRecomendaciones = []
+		for nodoRecomend in todos:
+			recomendacion = self.recomendarVecino(nodoRecomend)
+			tuplaAux = (nodoRecomend.label, recomendacion[0].label, recomendacion[1])
+			vectRecomendaciones.append(tuplaAux)
+		return vectRecomendaciones
+			
+	def recomendarVecino(self, nodo):
+		contadoresRecomend = {}
+		amigos = nodo.aristas_ad
+		contadoresRecomend[nodo] = 1
+		for nodoAmigo in amigos:
+			#Acá le sumo un contador para recomendar
+			amigosRecomendados = nodoAmigo.destino.aristas_ad
+			for amigoRec in amigosRecomendados:
+				if amigoRec.destino in contadoresRecomend: #Si el amigo ya apareció
+					contadoresRecomend[amigoRec.destino] += 1
+				else:
+					contadoresRecomend[amigoRec.destino] = 1
+		#Una vez que están los contadores, filtro quien NO es amigo
+		for nodoAmigo in amigos:
+			try:
+				del contadoresRecomend[nodoAmigo.destino]
+			except KeyError:
+				pass
+		#Y me quito a mi mismo
+		del contadoresRecomend[nodo]
+		masRecomendado = (Nodo("Nadie", "Nadie"), 0)
+		#Y ahora busco el que más amigos en común tiene
+		for recomendacion in contadoresRecomend:
+			contAux = contadoresRecomend[recomendacion]
+			if contAux > masRecomendado[1]:
+				masRecomendado = (recomendacion, contAux)
+		return masRecomendado
+
 """ devuelve el nodo que tiene mas conecciones con los otros nodos dentro del grafo"""
 def masPopular(grafo):
 	nodo_max = Nodo("nadie","nadie")
@@ -219,6 +264,6 @@ def masInfluyente(grafo):
 		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
 			nodoMasInfluyente = nodo
 	return nodoMasInfluyente
-		
-		
-	
+
+def recomendaciones(grafo):
+	return grafo.vecinosRecomendados()
