@@ -12,11 +12,14 @@ class Nodo (object):
 		self.distanciaAcumulada = float("inf")
 		self.visitado = False
 		self.restringido = False
-		#cantidad de veces que pasan por el nodo
+		# cantidad de veces que pasan por el nodo
 		self.cantVecesUsado = 0
+		self.padres = []
+		self.layer = -1
+		self.indice = 0
 
 	def __str__(self):
-		result = "id: " + self.id_nodo +" - Label: "+self.label+"- Visitado: "+str(self.visitado)+"\n"
+		result = "id: " + self.id_nodo +" - Label: "+self.label+" - Visitado: "+str(self.visitado)+" - cant amigos: "+str(len(self.aristas_ad))+"\n"
 		result += "Aristas: "
 		for arista in self.aristas_ad:
 			result += str(arista) + " - "
@@ -72,6 +75,8 @@ class Grafo (object):
 		grafo """
 		self.dicc_nodos = {}	
 		self.dicc_cam_min = {}
+		self.cantCaminos = {}
+		self.cc={}
 		
 	def __str__(self):
 		string =""
@@ -127,33 +132,7 @@ class Grafo (object):
 			nodo.visitado = False
 			nodo.distanciaAcumulada = float("inf")
 			nodo.cantVecesUsado = 0
-	
-	def prim(self, id_origen, peso_max):
-		""" devuelve una lista de aristas """	
-		heap_aristas = []
-		solucion = []
-		self.inicializar_en_0()
 		
-		nodo_inicial = self.dicc_nodos[id_origen]
-		nodo_inicial.visitado = True
-		
-		for arista in nodo_inicial.aristas_ad:
-			if arista.peso < peso_max:
-				heapq.heappush(heap_aristas, arista)
-		
-		while len(heap_aristas) > 0 :
-			arista = heapq.heappop(heap_aristas)
-			
-			if arista.destino.visitado == False:
-				
-				arista.destino.visitado = True
-				solucion.append(arista)
-				
-				for arista2 in arista.destino.aristas_ad :
-					if arista2.peso < peso_max:
-						heapq.heappush(heap_aristas, arista2)
-	
-		return solucion
 	""" determina el camino mas corto dado un vertice origen 
 	al resto de vertices en un grafo con pesos en cada arista."""
 	def dijkstra(self,nodo):
@@ -174,6 +153,8 @@ class Grafo (object):
 				if ( arista.destino.visitado == False ):
 					distanciaVecinoOrigenDesdeVertice = vertice.distanciaAcumulada + arista.getPeso()
 					distanciaVecinoOrigenDesdeVecino = arista.destino.distanciaAcumulada
+					if distanciaVecinoOrigenDesdeVecino == distanciaVecinoOrigenDesdeVecino:
+						vertice.cantVecesUsado=1
 					if distanciaVecinoOrigenDesdeVertice < distanciaVecinoOrigenDesdeVecino:
 						arista.destino.distanciaAcumulada = distanciaVecinoOrigenDesdeVertice
 						"""print "camino de vertice: ",
@@ -198,7 +179,83 @@ class Grafo (object):
 						"""
 					lista.append(arista.destino)
 		return camino
-
+	
+	"""###############################################################"""
+	"""se va a llamar a todas estas funciones por cada vertice, las separe para testearlas por separado """
+	def BFS(self, s):
+		self.inicializar_en_0()
+		s.layer = 0;
+		cola = []
+		cola.append(s)
+		supuestaCola = []
+		while len(cola) != 0:
+			v = cola.pop(0)
+			for vecino in v.aristas_ad:
+				if vecino.visitado == False:
+					vecino.layer = v.layer + 1
+					cola.append(vecino)
+					supuestaCola.append(vecino)
+			v.visitado = True
+			
+		return supuestaCola
+	
+	def padres(self, s):
+		for v in self.dicc_nodos.itervalues():
+			for w in self.dicc_nodos.itervalues():
+				self.cantCaminos[v,w]=1
+		
+		for v in self.dicc_nodos.itervalues():
+			for vecino in v.aristas_ad:
+				if vecino.layer == v.layer + 1:
+					vecino.padres.append(v)
+					self.cantCaminos[(s,vecino)]+=self.cantCaminos[(s,v)]
+	
+	def sumPadre(self, padre, profundidad):
+		if padre.layer < 1:
+			return
+		padre.cantVecesUsado += profundidad
+		profundidad += 1
+		for pa in padre.padres:
+			self.sumPadre(pa, profundidad)
+	
+	def calcularVecesUsado(self, supuestaCola):
+		""" agarro los vertices que estan en la utltima layer"""
+		max = Nodo("nadie","nadie")
+		maximos=[]
+		for v in self.dicc_nodos.itervalues():
+			if(v.layer>max.layer):
+				maximos=[]
+				maximos.append(v)
+			elif (v.layer==max.layer):
+				maximos.append(v)
+		
+			
+		max = supuestaCola.pop(len(supuestaCola))
+		maximos = []
+		maximos.append(max)
+		for v in supuestaCola:
+			if v.layer == max.layer:
+				maximos.append(v)
+		
+		"""recorro para atras por medio de los padres aumentando en +i (i profundidad)"""
+		for v in maximos:
+			for padre in v.padres:
+				self.sumPadre(padre, 0)
+	
+	def procesarIndice(self):
+		for nodo in self.dicc_nodos.itervalues():
+			nodo.indice += (nodo.cantVecesUsado/self.cantCaminos)
+	
+	def calcularTodosLosIndices(self):
+		for v in self.dicc_nodos.itervalues():
+			cola = self.BFS(v)
+			self.padres(v)
+			self.sumPadre(v)
+			self.calcularVecesUsado(cola)
+			self.procesarIndice()
+	
+	"""###############################################################"""
+	
 	#Esto es O(n) en memoria y O(n . A2) en cpu?
 	def vecinosRecomendados(self):
 		todos = list(self.dicc_nodos.values())
@@ -210,7 +267,9 @@ class Grafo (object):
 			tuplaAux = (nodoRecomend.label, recomendacion[0].label, recomendacion[1])
 			vectRecomendaciones.append(tuplaAux)
 		return vectRecomendaciones
-			
+	
+	
+
 	def recomendarVecino(self, nodo):
 		contadoresRecomend = {}
 		amigos = nodo.aristas_ad
@@ -239,28 +298,30 @@ class Grafo (object):
 				masRecomendado = (recomendacion, contAux)
 		return masRecomendado
 
+def comp(nodo1,nodo2):
+	if len(nodo1.aristas_ad) < len(nodo2.aristas_ad):
+		return 1
+	elif len(nodo1.aristas_ad) == len(nodo2.aristas_ad):
+		return 0
+	else:
+		return -1
+
 """ devuelve el nodo que tiene mas conecciones con los otros nodos dentro del grafo"""
 def masPopular(grafo):
-	nodo_max = Nodo("nadie","nadie")
-	for nodo in grafo.dicc_nodos.itervalues():
-		if(len(nodo_max.getVecinos())<len(nodo.getVecinos())):
-			nodo_max = nodo
-	return nodo_max
-
+	l = grafo.dicc_nodos.values()
+	l.sort(comp)
+	return l
+	
 """ devuelve el nodo que tiene mas caminos minimos que pasan por el que el resto"""
 def masInfluyente(grafo):
 	for nodo in grafo.dicc_nodos.itervalues():
 		caminosMinimosDesdeNodo = grafo.dijkstra(nodo)
 		for camino in caminosMinimosDesdeNodo.itervalues():
-			#ACA ESTOY CONTANDO DE MAS AL PRIMERO
 			for nodo in camino[1:]:
 				nodo.cantVecesUsado+=1
 	
 	nodoMasInfluyente=Nodo("nadie","nadie")
 	for nodo in grafo.dicc_nodos.itervalues():
-		#print de debugeo para mostrar que la cantidad de caminos minimos difiere de 
-		#los del mail
-		print nodo.getLabel()+" : "+str(nodo.cantVecesUsado)
 		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
 			nodoMasInfluyente = nodo
 	return nodoMasInfluyente

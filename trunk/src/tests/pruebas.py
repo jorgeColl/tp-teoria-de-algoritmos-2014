@@ -5,7 +5,7 @@ Created on 18/10/2014
 '''
 import unittest
 import main
-from grafo.grafo import masPopular, masInfluyente
+from grafo.grafo import masPopular, masInfluyente,recomendaciones
 
 class Test(unittest.TestCase):
 
@@ -13,20 +13,32 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
-
     def tearDown(self):
         pass
 
-
     def testMasPopular(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
-        maspopular = masPopular(red)
-        self.assertEqual(maspopular.getId(),"5" ,maspopular.getLabel())
-    
+        maspopulares = masPopular(red)
+        nodoMasPopular = maspopulares[0]
+        listaVieja = []
+        for v in maspopulares:
+            for w in listaVieja:
+                bool = len(w.aristas_ad) < len(v.aristas_ad)
+                self.assertFalse(bool, "ERROR lista no odenada")
+            listaVieja.append(v)
+        self.assertEqual(nodoMasPopular.getId(),"5" ,nodoMasPopular.getLabel())
+        
     def testMasPopular2(self):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
-        nodoMasPopular = masPopular(red)
+        maspopulares = masPopular(red)
+        nodoMasPopular = maspopulares[0]
         self.assertEqual(nodoMasPopular.getLabel(), "Juana", "no coinciden los mas inlfuyentes, lo obtenido fue "+nodoMasPopular.getLabel())
+        listaVieja = []
+        for v in maspopulares:
+            for w in listaVieja:
+                bool = len(w.aristas_ad) < len(v.aristas_ad)
+                self.assertFalse(bool, "ERROR lista no odenada")
+            listaVieja.append(v)
         
     def testMasInfluyente1(self):
         print "amigosPrueba2.gdf"
@@ -48,8 +60,8 @@ class Test(unittest.TestCase):
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "Juana", "no coinciden los mas inlfuyentes se obtuvo: "+nodoMasInfluyente.getLabel())
         """segun el mail, los caminos minimos son:
-        En total hay 132 caminos mínimos
-        Por cada persona pasan la siguiente cantidad de caminos mínimos:
+        En total hay 132 caminos minimos
+        Por cada persona pasan la siguiente cantidad de caminos minimos:
         Juana: 38
         Roberto: 38
         Carlos: 22
@@ -71,6 +83,9 @@ class Test(unittest.TestCase):
     
     def testSujerirAmigo(self):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
+        listaRecomendaciones = recomendaciones(red)
+        for item in listaRecomendaciones:
+            print "{0}: {1} ({2} amigos en comun)".format(item[0], item[1], item[2])
         pass
         """ LO QUE DIJIERON QUE EL EJEMPLO DEBERIA DEVOLVER(SEGUN EL MAIL QUE MANDARON)
         -----------------recomendaciones-----------------
