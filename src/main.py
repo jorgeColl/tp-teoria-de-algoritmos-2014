@@ -62,5 +62,5 @@ def main():
             listaRecomendaciones = recomendaciones(red)
             for item in listaRecomendaciones:
                 print "{0}: {1} ({2} amigos en comun)".format(item[0], item[1], item[2])
-main()
+
     
