@@ -39,17 +39,15 @@ def tomar_opcion_menu():
 def main():
     red = cargarRedDesdeArchivo("amigos.gdf")
     
-    #distancia1, camino_minimo1 = floyd(grafo_confianza, peso_maximo)
-    #distancia2, camino_minimo2 = floyd(grafo_tiempo, peso_maximo)
-    
     opcion = 1
     while opcion != 0 :
         opcion = tomar_opcion_menu()
         if opcion == 1:
             print "ha elegido buscar el amigo mas popular"
             print "su amigo mas popular es:"
-            amigoMasPopular = masPopular(red) 
-            print amigoMasPopular
+            amigoMasPopularres = masPopular(red) 
+            for amigo in amigoMasPopularres:
+                print amigo.getLabel()
         
         elif opcion == 2:
             print "ha elegido buscar el amigo mas influyente"

@@ -39,8 +39,39 @@ class Test(unittest.TestCase):
                 bool = len(w.aristas_ad) < len(v.aristas_ad)
                 self.assertFalse(bool, "ERROR lista no odenada")
             listaVieja.append(v)
+    def testBFS_1(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
+        s = red.getNodo("5")
+        sup = red.BFS(s)
+        tomas = sup.pop()
+        juan = sup.pop()
+       
+        self.assertTrue(juan.getLabel() == "JUAN", "ERROR: se esperaba JUAN, se obtubo: " + juan.getLabel())
+        self.assertTrue(juan.layer == 1, "ERROR: se esperaba Layer 1, se obtubo: " + str(juan.layer))
+        self.assertTrue(tomas.getLabel() == "TOMAS", "ERROR: se esperaba TOMAS, se obtubo: " + tomas.getLabel())
+        self.assertTrue(tomas.layer == 2, "ERROR: se esperaba Layer 2, se obtubo: " + str(tomas.layer))
+    
+    def testBFS_2(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
+        s = red.getNodo("3")
+        sup = red.BFS(s)
         
-    def testMasInfluyente1(self):
+        juan = sup.pop()
+        tomas = sup.pop()
+        luis = sup.pop()
+        pepe = sup.pop()
+        
+        self.assertTrue(juan.getLabel()=="JUAN")
+        self.assertTrue(juan.layer==2)
+        self.assertTrue(tomas.getLabel()=="TOMAS")
+        self.assertTrue(tomas.layer==2)
+        self.assertTrue(luis.getLabel()=="LUIS")
+        self.assertTrue(luis.layer==1)
+        self.assertTrue(pepe.getLabel()=="PEPE")
+        self.assertTrue(pepe.layer==1)
+        
+        
+    """def testMasInfluyente1(self):
         print "amigosPrueba2.gdf"
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         nodoMasInfluyente = masInfluyente(red)
@@ -51,7 +82,8 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS", "no coinciden los mas inlfuyentes")
-        
+    """
+    """
     def testMasInfluyente3(self):
         #este test corrobora lo que mandaron por mail del resultado del ejercicio de ejemplo en
         # el enunciado del tp
@@ -59,7 +91,9 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "Juana", "no coinciden los mas inlfuyentes se obtuvo: "+nodoMasInfluyente.getLabel())
-        """segun el mail, los caminos minimos son:
+        
+        
+        segun el mail, los caminos minimos son:
         En total hay 132 caminos minimos
         Por cada persona pasan la siguiente cantidad de caminos minimos:
         Juana: 38
@@ -74,20 +108,15 @@ class Test(unittest.TestCase):
         Brenda: 0
         Tomas: 0
         """
-    def testMasInfluyente4(self):
-        red = main.cargarRedDesdeArchivo("amigosPrueba1.gdf")
-        nodoMasInfluyente = masInfluyente(red)
-        #TODAVIA TENGO QUE HACER LA CUENTA DE SI ESTA BIEN EL RESULTADO
-        print nodoMasInfluyente
-                
-    
-    def testSujerirAmigo(self):
+
+    """def testSujerirAmigo(self):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         listaRecomendaciones = recomendaciones(red)
         for item in listaRecomendaciones:
             print "{0}: {1} ({2} amigos en comun)".format(item[0], item[1], item[2])
         pass
-        """ LO QUE DIJIERON QUE EL EJEMPLO DEBERIA DEVOLVER(SEGUN EL MAIL QUE MANDARON)
+        
+        LO QUE DIJIERON QUE EL EJEMPLO DEBERIA DEVOLVER(SEGUN EL MAIL QUE MANDARON)
         -----------------recomendaciones-----------------
         Roberto: Esteban (2 amigo(s) en comun)
         Milena: Monica (2 amigo(s) en comun)
