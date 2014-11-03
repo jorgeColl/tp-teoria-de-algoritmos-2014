@@ -105,26 +105,6 @@ class Grafo (object):
 		if(self.no_dirigido):
 			arista2 = Arista(nodo_destino, nodo_origen)
 			nodo_destino.aristas_ad.append(arista2)
-				
-	
-	""" carga el peso en una buscarArista previamente creada """
-	def cargar_peso_arista(self, id_origen, id_destino, peso):
-		#TODO BUSQUEDA BINARIA
-		for ar in self.dicc_nodos[id_origen].aristas_ad:
-			if ar.destino.id_nodo == id_destino:
-				ar.peso = int(peso)
-				break
-				
-	""" dado un id_origen y un id_destino se busca y devuelve la buscarArista
-	que tenga origen en id_origen y destino en id_destino
-	En caso de que la arista NO exista, se devolvera una con peso infinito """
-	def buscarArista(self, id_origen, id_destino):
-		nodo = self.dicc_nodos[id_origen]
-		#TODO busqueda binaria->hay que ordenar aristas por destino
-		for arista in nodo.aristas_ad:
-			if arista.destino.id_nodo == id_destino:
-				return arista
-		return Arista(None, None)
 	
 	"""	inicializa todos los nodos del grafo como no visitados """
 	def inicializar_en_0(self):	
@@ -146,10 +126,8 @@ class Grafo (object):
 		
 		while len(lista)>0 :
 			vertice = lista.pop(0)
-			#print "vertice:"+vertice.getLabel()
 			vertice.visitado = True
 			for arista in vertice.getVecinos():
-				#print "destino:"+arista.destino.getLabel()
 				if ( arista.destino.visitado == False ):
 					distanciaVecinoOrigenDesdeVertice = vertice.distanciaAcumulada + arista.getPeso()
 					distanciaVecinoOrigenDesdeVecino = arista.destino.distanciaAcumulada
@@ -157,26 +135,8 @@ class Grafo (object):
 						vertice.cantVecesUsado=1
 					if distanciaVecinoOrigenDesdeVertice < distanciaVecinoOrigenDesdeVecino:
 						arista.destino.distanciaAcumulada = distanciaVecinoOrigenDesdeVertice
-						"""print "camino de vertice: ",
-						for vert in camino[vertice.getId()]:
-							print vert.getLabel()+" -> ",
-						print ""
-						print "camino anterior: ",
-						if(camino.has_key(arista.destino.getId())):
-							for vert in camino[arista.destino.getId()]:
-								print vert.getLabel()+" -> ",
-							print ""
-						else:
-							print "no habia camino"
-						"""
 						camino[arista.destino.getId()] = list(camino[vertice.getId()])
 						camino[arista.destino.getId()].append (vertice)
-						"""
-						print"camino queda: ",
-						for vert in camino[arista.destino.getId()]:
-							print vert.getLabel()+" -> ",
-						print ""
-						"""
 					lista.append(arista.destino)
 		return camino
 	
@@ -185,18 +145,19 @@ class Grafo (object):
 	def BFS(self, s):
 		self.inicializar_en_0()
 		s.layer = 0;
+		s.visitado = True
 		cola = []
 		cola.append(s)
 		supuestaCola = []
 		while len(cola) != 0:
 			v = cola.pop(0)
-			for vecino in v.aristas_ad:
+			for arista in v.aristas_ad:
+				vecino = arista.destino
 				if vecino.visitado == False:
+					vecino.visitado = True
 					vecino.layer = v.layer + 1
 					cola.append(vecino)
 					supuestaCola.append(vecino)
-			v.visitado = True
-			
 		return supuestaCola
 	
 	def padres(self, s):
@@ -211,12 +172,18 @@ class Grafo (object):
 					self.cantCaminos[(s,vecino)]+=self.cantCaminos[(s,v)]
 	
 	def sumPadre(self, padre, profundidad):
+		nodos = self.dicc_nodos.values()
+		nodos.sort(ordenarPorLayer)
+		for nodo in nodos:
+			print nodo.layer
+		for nodo in nodos:
+			if(nodo.layer>1):
+				for padre in nodo.padres:
+					padre.cantVecesUsado
 		if padre.layer < 1:
 			return
 		padre.cantVecesUsado += profundidad
 		profundidad += 1
-		for pa in padre.padres:
-			self.sumPadre(pa, profundidad)
 	
 	def calcularVecesUsado(self, supuestaCola):
 		""" agarro los vertices que estan en la utltima layer"""
@@ -298,7 +265,15 @@ class Grafo (object):
 				masRecomendado = (recomendacion, contAux)
 		return masRecomendado
 
-def comp(nodo1,nodo2):
+def ordenarPorLayer(nodo1, nodo2):
+	if len(nodo1.layer) < len(nodo2.layer):
+		return 1
+	elif len(nodo1.layer) == len(nodo2.layer):
+		return 0
+	else:
+		return -1
+
+def comp(nodo1, nodo2):
 	if len(nodo1.aristas_ad) < len(nodo2.aristas_ad):
 		return 1
 	elif len(nodo1.aristas_ad) == len(nodo2.aristas_ad):
