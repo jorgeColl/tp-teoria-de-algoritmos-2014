@@ -39,6 +39,7 @@ class Test(unittest.TestCase):
                 bool = len(w.aristas_ad) < len(v.aristas_ad)
                 self.assertFalse(bool, "ERROR lista no odenada")
             listaVieja.append(v)
+    
     def testBFS_1(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         s = red.getNodo("5")
@@ -69,6 +70,83 @@ class Test(unittest.TestCase):
         self.assertTrue(luis.layer==1)
         self.assertTrue(pepe.getLabel()=="PEPE")
         self.assertTrue(pepe.layer==1)
+        
+    def testPadres1(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
+        s = red.getNodo("5")
+        sup = red.BFS(s)
+        red.padres(s)
+        
+        tomas = sup.pop()
+        self.assertTrue(red.cantCaminos[(s,tomas)]==1)
+        
+        padreDeTomas = tomas.padres[0]
+        self.assertTrue(padreDeTomas.getLabel()=="JUAN")
+        self.assertTrue(red.cantCaminos[(s,padreDeTomas)]==1, red.cantCaminos[(s,padreDeTomas)])
+        
+        juan = sup.pop()
+        self.assertTrue(red.cantCaminos[(s,juan)]==1)
+        
+        padreDeJuan=juan.padres[0]
+        self.assertTrue(padreDeJuan.getLabel()=="PEPE")
+    
+    def testPadres2(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
+        s = red.getNodo("3")
+        sup = red.BFS(s)
+        red.padres(s)
+        
+        juan = sup.pop()
+        tomas = sup.pop()
+        luis = sup.pop()
+        pepe = sup.pop()
+        
+        self.assertTrue(red.cantCaminos[(s, pepe)] == 1, red.cantCaminos[(s, pepe)])
+        self.assertTrue(red.cantCaminos[(s, luis)] == 1, red.cantCaminos[(s, luis)])
+        self.assertTrue(red.cantCaminos[(s, juan)] == 1, red.cantCaminos[(s, juan)])
+        self.assertTrue(red.cantCaminos[(s, tomas)] == 2, red.cantCaminos[(s, tomas)])
+        
+        padreDeJuan = juan.padres[0]
+        padre1DeTomas = tomas.padres[0]
+        padre2DeTomas = tomas.padres[1]
+        padreDeLuis = luis.padres[0]
+        padreDePepe = pepe.padres[0]
+        
+        self.assertTrue(padreDeJuan.getLabel() == "LUIS")
+        self.assertTrue(padre1DeTomas.getLabel() == "PEPE")
+        self.assertTrue(padre2DeTomas.getLabel() == "LUIS")
+        self.assertTrue(padreDeLuis.getLabel() == "FER")
+        self.assertTrue(padreDePepe.getLabel() == "FER")
+       
+    def test1SumPadres(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
+        s = red.getNodo("5")
+        colaOrdenada = red.BFS(s)
+        red.padres(s)
+        red.sumPadre(colaOrdenada)
+        
+        tomas = colaOrdenada[0]
+        juan = colaOrdenada[1]
+        
+        self.assertTrue(juan.cantVecesUsado == 1, juan.cantVecesUsado)
+        self.assertTrue(tomas.cantVecesUsado == 0, tomas.cantVecesUsado)
+    
+    def test2SumPadres(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
+        s = red.getNodo("3")
+        colaOrdenada = red.BFS(s)
+        red.padres(s)
+        red.sumPadre(colaOrdenada)
+        
+        juan = colaOrdenada[0]
+        tomas = colaOrdenada[1]
+        luis = colaOrdenada[2]
+        pepe = colaOrdenada[3]
+        
+        self.assertTrue(juan.cantVecesUsado == 0)
+        self.assertTrue(tomas.cantVecesUsado == 0)
+        self.assertTrue(pepe.cantVecesUsado == 1)
+        self.assertTrue(luis.cantVecesUsado == 2)
         
         
     """def testMasInfluyente1(self):
