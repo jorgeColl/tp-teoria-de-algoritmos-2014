@@ -163,62 +163,31 @@ class Grafo (object):
 	def padres(self, s):
 		for v in self.dicc_nodos.itervalues():
 			for w in self.dicc_nodos.itervalues():
-				self.cantCaminos[v,w]=1
+				self.cantCaminos[v,w]=0
 		
 		for v in self.dicc_nodos.itervalues():
-			for vecino in v.aristas_ad:
+			for arista in v.aristas_ad:
+				vecino = arista.destino
 				if vecino.layer == v.layer + 1:
 					vecino.padres.append(v)
-					self.cantCaminos[(s,vecino)]+=self.cantCaminos[(s,v)]
+					self.cantCaminos[(s,vecino)]+=1
 	
-	def sumPadre(self, padre, profundidad):
-		nodos = self.dicc_nodos.values()
-		nodos.sort(ordenarPorLayer)
-		for nodo in nodos:
-			print nodo.layer
-		for nodo in nodos:
-			if(nodo.layer>1):
+	def sumPadre(self, colaOrdenada):
+		colaOrdenada.reverse()
+		for nodo in colaOrdenada:
+			if(nodo.layer > 1):
 				for padre in nodo.padres:
-					padre.cantVecesUsado
-		if padre.layer < 1:
-			return
-		padre.cantVecesUsado += profundidad
-		profundidad += 1
-	
-	def calcularVecesUsado(self, supuestaCola):
-		""" agarro los vertices que estan en la utltima layer"""
-		max = Nodo("nadie","nadie")
-		maximos=[]
-		for v in self.dicc_nodos.itervalues():
-			if(v.layer>max.layer):
-				maximos=[]
-				maximos.append(v)
-			elif (v.layer==max.layer):
-				maximos.append(v)
-		
-			
-		max = supuestaCola.pop(len(supuestaCola))
-		maximos = []
-		maximos.append(max)
-		for v in supuestaCola:
-			if v.layer == max.layer:
-				maximos.append(v)
-		
-		"""recorro para atras por medio de los padres aumentando en +i (i profundidad)"""
-		for v in maximos:
-			for padre in v.padres:
-				self.sumPadre(padre, 0)
+					padre.cantVecesUsado += nodo.cantVecesUsado + 1
 	
 	def procesarIndice(self):
 		for nodo in self.dicc_nodos.itervalues():
-			nodo.indice += (nodo.cantVecesUsado/self.cantCaminos)
+			nodo.indice += (nodo.cantVecesUsado / self.cantCaminos)
 	
 	def calcularTodosLosIndices(self):
 		for v in self.dicc_nodos.itervalues():
 			cola = self.BFS(v)
 			self.padres(v)
-			self.sumPadre(v)
-			self.calcularVecesUsado(cola)
+			self.sumPadre(v, cola)
 			self.procesarIndice()
 	
 	"""###############################################################"""
