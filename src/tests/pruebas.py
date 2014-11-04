@@ -23,8 +23,8 @@ class Test(unittest.TestCase):
         listaVieja = []
         for v in maspopulares:
             for w in listaVieja:
-                bool = len(w.aristas_ad) < len(v.aristas_ad)
-                self.assertFalse(bool, "ERROR lista no odenada")
+                booll = len(w.aristas_ad) < len(v.aristas_ad)
+                self.assertFalse(booll, "ERROR lista no odenada")
             listaVieja.append(v)
         self.assertEqual(nodoMasPopular.getId(),"5" ,nodoMasPopular.getLabel())
         
@@ -32,12 +32,12 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         maspopulares = masPopular(red)
         nodoMasPopular = maspopulares[0]
-        self.assertEqual(nodoMasPopular.getLabel(), "Juana", "no coinciden los mas inlfuyentes, lo obtenido fue "+nodoMasPopular.getLabel())
+        self.assertEqual(nodoMasPopular.getLabel(), "Juana")
         listaVieja = []
         for v in maspopulares:
             for w in listaVieja:
-                bool = len(w.aristas_ad) < len(v.aristas_ad)
-                self.assertFalse(bool, "ERROR lista no odenada")
+                booll = len(w.aristas_ad) < len(v.aristas_ad)
+                self.assertFalse(booll, "ERROR lista no odenada")
             listaVieja.append(v)
     
     def testBFS_1(self):
@@ -47,10 +47,10 @@ class Test(unittest.TestCase):
         tomas = sup.pop()
         juan = sup.pop()
        
-        self.assertTrue(juan.getLabel() == "JUAN", "ERROR: se esperaba JUAN, se obtubo: " + juan.getLabel())
-        self.assertTrue(juan.layer == 1, "ERROR: se esperaba Layer 1, se obtubo: " + str(juan.layer))
-        self.assertTrue(tomas.getLabel() == "TOMAS", "ERROR: se esperaba TOMAS, se obtubo: " + tomas.getLabel())
-        self.assertTrue(tomas.layer == 2, "ERROR: se esperaba Layer 2, se obtubo: " + str(tomas.layer))
+        self.assertEqual(juan.getLabel() , "JUAN")
+        self.assertEqual(juan.layer , 1)
+        self.assertEqual(tomas.getLabel() , "TOMAS",)
+        self.assertEqual(tomas.layer , 2)
     
     def testBFS_2(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
@@ -62,49 +62,49 @@ class Test(unittest.TestCase):
         luis = sup.pop()
         pepe = sup.pop()
         
-        self.assertTrue(juan.getLabel()=="JUAN")
-        self.assertTrue(juan.layer==2)
-        self.assertTrue(tomas.getLabel()=="TOMAS")
-        self.assertTrue(tomas.layer==2)
-        self.assertTrue(luis.getLabel()=="LUIS")
-        self.assertTrue(luis.layer==1)
-        self.assertTrue(pepe.getLabel()=="PEPE")
-        self.assertTrue(pepe.layer==1)
+        self.assertEqual(juan.getLabel(), "JUAN")
+        self.assertEqual(juan.layer, 2)
+        self.assertEqual(tomas.getLabel(), "TOMAS")
+        self.assertEqual(tomas.layer, 2)
+        self.assertEqual(luis.getLabel(), "LUIS")
+        self.assertEqual(luis.layer, 1)
+        self.assertEqual(pepe.getLabel(), "PEPE")
+        self.assertEqual(pepe.layer, 1)
         
     def testPadres1(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         s = red.getNodo("5")
         sup = red.BFS(s)
-        red.padres(s)
+        red.padres()
         
         tomas = sup.pop()
-        self.assertTrue(red.cantCaminos[(s,tomas)]==1)
+        self.assertEqual(red.cantCaminos[tomas], 1)
         
         padreDeTomas = tomas.padres[0]
-        self.assertTrue(padreDeTomas.getLabel()=="JUAN")
-        self.assertTrue(red.cantCaminos[(s,padreDeTomas)]==1, red.cantCaminos[(s,padreDeTomas)])
+        self.assertEqual(padreDeTomas.getLabel(), "JUAN")
+        self.assertEqual(red.cantCaminos[padreDeTomas] ,1)
         
         juan = sup.pop()
-        self.assertTrue(red.cantCaminos[(s,juan)]==1)
+        self.assertEqual(red.cantCaminos[juan], 1)
         
-        padreDeJuan=juan.padres[0]
-        self.assertTrue(padreDeJuan.getLabel()=="PEPE")
+        padreDeJuan = juan.padres[0]
+        self.assertEqual(padreDeJuan.getLabel(), "PEPE")
     
     def testPadres2(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         s = red.getNodo("3")
         sup = red.BFS(s)
-        red.padres(s)
+        red.padres()
         
         juan = sup.pop()
         tomas = sup.pop()
         luis = sup.pop()
         pepe = sup.pop()
         
-        self.assertTrue(red.cantCaminos[(s, pepe)] == 1, red.cantCaminos[(s, pepe)])
-        self.assertTrue(red.cantCaminos[(s, luis)] == 1, red.cantCaminos[(s, luis)])
-        self.assertTrue(red.cantCaminos[(s, juan)] == 1, red.cantCaminos[(s, juan)])
-        self.assertTrue(red.cantCaminos[(s, tomas)] == 2, red.cantCaminos[(s, tomas)])
+        self.assertEqual(red.cantCaminos[pepe] ,1)
+        self.assertEqual(red.cantCaminos[luis] ,1)
+        self.assertEqual(red.cantCaminos[juan] , 1)
+        self.assertEqual(red.cantCaminos[tomas] , 2)
         
         padreDeJuan = juan.padres[0]
         padre1DeTomas = tomas.padres[0]
@@ -112,30 +112,30 @@ class Test(unittest.TestCase):
         padreDeLuis = luis.padres[0]
         padreDePepe = pepe.padres[0]
         
-        self.assertTrue(padreDeJuan.getLabel() == "LUIS")
-        self.assertTrue(padre1DeTomas.getLabel() == "PEPE")
-        self.assertTrue(padre2DeTomas.getLabel() == "LUIS")
-        self.assertTrue(padreDeLuis.getLabel() == "FER")
-        self.assertTrue(padreDePepe.getLabel() == "FER")
+        self.assertEqual(padreDeJuan.getLabel(), "LUIS")
+        self.assertEqual(padre1DeTomas.getLabel(), "PEPE")
+        self.assertEqual(padre2DeTomas.getLabel(), "LUIS")
+        self.assertEqual(padreDeLuis.getLabel(), "FER")
+        self.assertEqual(padreDePepe.getLabel(), "FER")
        
     def test1SumPadres(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         s = red.getNodo("5")
         colaOrdenada = red.BFS(s)
-        red.padres(s)
+        red.padres()
         red.sumPadre(colaOrdenada)
         
         tomas = colaOrdenada[0]
         juan = colaOrdenada[1]
         
-        self.assertTrue(juan.cantVecesUsado == 1, juan.cantVecesUsado)
-        self.assertTrue(tomas.cantVecesUsado == 0, tomas.cantVecesUsado)
+        self.assertEqual(juan.cantVecesUsado[tomas], 1)
+        self.assertEqual(tomas.cantVecesUsado[tomas], 0)
     
     def test2SumPadres(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         s = red.getNodo("3")
         colaOrdenada = red.BFS(s)
-        red.padres(s)
+        red.padres()
         red.sumPadre(colaOrdenada)
         
         juan = colaOrdenada[0]
@@ -143,34 +143,42 @@ class Test(unittest.TestCase):
         luis = colaOrdenada[2]
         pepe = colaOrdenada[3]
         
-        self.assertTrue(juan.cantVecesUsado == 0)
-        self.assertTrue(tomas.cantVecesUsado == 0)
-        self.assertTrue(pepe.cantVecesUsado == 1)
-        self.assertTrue(luis.cantVecesUsado == 2)
-        
-        
-    """def testMasInfluyente1(self):
-        print "amigosPrueba2.gdf"
+        self.assertEqual(juan.cantVecesUsado[tomas], 0)
+        self.assertEqual(tomas.cantVecesUsado[pepe], 0)
+        self.assertEqual(pepe.cantVecesUsado[tomas], 1)
+        self.assertEqual(luis.cantVecesUsado[tomas], 1)
+        self.assertEqual(luis.cantVecesUsado[juan], 1)
+    """
+    def testCalcularTodosLosIndices1(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
+        lista = red.calcularTodosLosIndices()
+    
+    def testCalcularTodosLosIndices2(self):
+        red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
+        lista = red.calcularTodosLosIndices()
+        for v in lista:
+            print v.getLabel()+" I: "+str(v.indice)
+    
+    def testMasInfluyente1(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         nodoMasInfluyente = masInfluyente(red)
-        self.assertEqual(nodoMasInfluyente.getLabel(), "JUAN", "no coinciden los mas inlfuyentes")
+        self.assertEqual(nodoMasInfluyente.getLabel(), "JUAN" )
     
     def testMasInfluyente2(self):
-        print "amigosPrueba3.gdf"
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         nodoMasInfluyente = masInfluyente(red)
-        self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS", "no coinciden los mas inlfuyentes")
+        self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS")
     """
-    """
+    
     def testMasInfluyente3(self):
         #este test corrobora lo que mandaron por mail del resultado del ejercicio de ejemplo en
         # el enunciado del tp
-        print "amigosPruebaEnunciadoTp.gdf"
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         nodoMasInfluyente = masInfluyente(red)
-        self.assertEqual(nodoMasInfluyente.getLabel(), "Juana", "no coinciden los mas inlfuyentes se obtuvo: "+nodoMasInfluyente.getLabel())
+        self.assertEqual(nodoMasInfluyente.getLabel(), "Juana")
+        print "Total caminos: "+str(red.cantTotalCaminosMinimos)
         
-        
+        """
         segun el mail, los caminos minimos son:
         En total hay 132 caminos minimos
         Por cada persona pasan la siguiente cantidad de caminos minimos:

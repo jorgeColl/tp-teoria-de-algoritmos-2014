@@ -13,7 +13,8 @@ class Nodo (object):
 		self.visitado = False
 		self.restringido = False
 		# cantidad de veces que pasan por el nodo
-		self.cantVecesUsado = 0
+		self.cantVecesUsado = {}
+		self.cantTotalVecesUsado = 0
 		self.padres = []
 		self.layer = -1
 		self.indice = 0
@@ -77,6 +78,9 @@ class Grafo (object):
 		self.dicc_cam_min = {}
 		self.cantCaminos = {}
 		self.cc={}
+		#DEBUG
+		self.cantTotalCaminosMinimos=0
+		self.cantTotalCaminosPasantesEn = {}
 		
 	def __str__(self):
 		string =""
@@ -111,34 +115,11 @@ class Grafo (object):
 		for nodo in self.dicc_nodos.itervalues():
 			nodo.visitado = False
 			nodo.distanciaAcumulada = float("inf")
-			nodo.cantVecesUsado = 0
-		
-	""" determina el camino mas corto dado un vertice origen 
-	al resto de vertices en un grafo con pesos en cada arista."""
-	def dijkstra(self,nodo):
-		"""pone todos como no visitados y distancia en infinito"""
-		self.inicializar_en_0()
-		camino = {}
-		camino[nodo.getId()]=list()
-		nodo.distanciaAcumulada = 0
-		lista = list()
-		lista.append(nodo)
-		
-		while len(lista)>0 :
-			vertice = lista.pop(0)
-			vertice.visitado = True
-			for arista in vertice.getVecinos():
-				if ( arista.destino.visitado == False ):
-					distanciaVecinoOrigenDesdeVertice = vertice.distanciaAcumulada + arista.getPeso()
-					distanciaVecinoOrigenDesdeVecino = arista.destino.distanciaAcumulada
-					if distanciaVecinoOrigenDesdeVecino == distanciaVecinoOrigenDesdeVecino:
-						vertice.cantVecesUsado=1
-					if distanciaVecinoOrigenDesdeVertice < distanciaVecinoOrigenDesdeVecino:
-						arista.destino.distanciaAcumulada = distanciaVecinoOrigenDesdeVertice
-						camino[arista.destino.getId()] = list(camino[vertice.getId()])
-						camino[arista.destino.getId()].append (vertice)
-					lista.append(arista.destino)
-		return camino
+			nodo.cantTotalVecesUsado = 0
+			nodo.padres = []
+			self.cantCaminos[nodo] = 1
+			for v in self.dicc_nodos.itervalues():
+				nodo.cantVecesUsado[v] = 0.0
 	
 	"""###############################################################"""
 	"""se va a llamar a todas estas funciones por cada vertice, las separe para testearlas por separado """
@@ -160,35 +141,59 @@ class Grafo (object):
 					supuestaCola.append(vecino)
 		return supuestaCola
 	
-	def padres(self, s):
+	def padres(self):
 		for v in self.dicc_nodos.itervalues():
-			for w in self.dicc_nodos.itervalues():
-				self.cantCaminos[v,w]=0
+				self.cantCaminos[v]=0
 		
 		for v in self.dicc_nodos.itervalues():
 			for arista in v.aristas_ad:
 				vecino = arista.destino
 				if vecino.layer == v.layer + 1:
 					vecino.padres.append(v)
-					self.cantCaminos[(s,vecino)]+=1
+					self.cantCaminos[vecino]+=1
+		for v in self.dicc_nodos.itervalues():
+				self.cantTotalCaminosMinimos+=self.cantCaminos[v]
 	
 	def sumPadre(self, colaOrdenada):
 		colaOrdenada.reverse()
 		for nodo in colaOrdenada:
 			if(nodo.layer > 1):
 				for padre in nodo.padres:
-					padre.cantVecesUsado += nodo.cantVecesUsado + 1
+					#cantidad de veces usado para llegar al nodo "nodo"
+					padre.cantVecesUsado[nodo] += nodo.cantTotalVecesUsado + 1.0
+					padre.cantTotalVecesUsado += nodo.cantTotalVecesUsado + 1.0
 	
 	def procesarIndice(self):
-		for nodo in self.dicc_nodos.itervalues():
-			nodo.indice += (nodo.cantVecesUsado / self.cantCaminos)
-	
+		for v in self.dicc_nodos.itervalues():
+			for w in self.dicc_nodos.itervalues():
+				if(self.cantCaminos[w]!=0):
+					v.indice += (v.cantVecesUsado[w] / self.cantCaminos[w])
+		
+		"""for r in self.dicc_nodos.values():
+			print r.getLabel()+" :> ",
+			for w in self.dicc_nodos.itervalues():
+				print w.getLabel()+" :"+str(r.cantVecesUsado[w])+"  ",
+			print""
+		"""
+	""" este metodo lleva a cabo todo el proceso de calculo del indice para cada vertice
+	se busco separar el proceso en metodos pequenios cada uno de orden O(E+V), facilitando asi el testing"""
 	def calcularTodosLosIndices(self):
+		#DEBUG
+		for w in self.dicc_nodos.itervalues():
+			self.cantTotalCaminosPasantesEn[w]=0
+		
 		for v in self.dicc_nodos.itervalues():
 			cola = self.BFS(v)
-			self.padres(v)
-			self.sumPadre(v, cola)
+			self.padres()
+			self.sumPadre(cola)
 			self.procesarIndice()
+			#DEBUG
+			for w in self.dicc_nodos.itervalues():
+				self.cantTotalCaminosPasantesEn[w]+=w.cantTotalVecesUsado
+		#DEBUG
+		for w in self.dicc_nodos.itervalues():
+			print w.getLabel()+" caminos : "+str(self.cantTotalCaminosPasantesEn[w])
+		return self.dicc_nodos.values()
 	
 	"""###############################################################"""
 	
@@ -257,16 +262,14 @@ def masPopular(grafo):
 	return l
 	
 """ devuelve el nodo que tiene mas caminos minimos que pasan por el que el resto"""
-def masInfluyente(grafo):
-	for nodo in grafo.dicc_nodos.itervalues():
-		caminosMinimosDesdeNodo = grafo.dijkstra(nodo)
-		for camino in caminosMinimosDesdeNodo.itervalues():
-			for nodo in camino[1:]:
-				nodo.cantVecesUsado+=1
-	
+def masInfluyente(grafo):	
+	lista = grafo.calcularTodosLosIndices()
 	nodoMasInfluyente=Nodo("nadie","nadie")
-	for nodo in grafo.dicc_nodos.itervalues():
-		if(nodoMasInfluyente.cantVecesUsado < nodo.cantVecesUsado):
+	for nodo in lista:
+		#DEBUG
+		print nodo.getLabel()+": "+str(nodo.indice)
+		
+		if(nodoMasInfluyente.indice < nodo.indice):
 			nodoMasInfluyente = nodo
 	return nodoMasInfluyente
 
