@@ -123,6 +123,7 @@ class Grafo (object):
 	
 	"""###############################################################"""
 	"""se va a llamar a todas estas funciones por cada vertice, las separe para testearlas por separado """
+	#Orden O(V+E)
 	def BFS(self, s):
 		self.inicializar_en_0()
 		s.layer = 0;
@@ -141,6 +142,7 @@ class Grafo (object):
 					supuestaCola.append(vecino)
 		return supuestaCola
 	
+	#Orden O(V+E)
 	def padres(self):
 		for v in self.dicc_nodos.itervalues():
 				self.cantCaminos[v]=0
@@ -154,6 +156,7 @@ class Grafo (object):
 		for v in self.dicc_nodos.itervalues():
 				self.cantTotalCaminosMinimos+=self.cantCaminos[v]
 	
+	#Orden O(V+E)
 	def sumPadre(self, colaOrdenada):
 		colaOrdenada.reverse()
 		for nodo in colaOrdenada:
@@ -162,10 +165,11 @@ class Grafo (object):
 					#cantidad de veces usado para llegar al nodo "nodo"
 					padre.cantVecesUsado[nodo] += nodo.cantTotalVecesUsado + 1.0
 					padre.cantTotalVecesUsado += nodo.cantTotalVecesUsado + 1.0
-	
+	#Orden O(V+E)
 	def procesarIndice(self):
 		for v in self.dicc_nodos.itervalues():
-			for w in self.dicc_nodos.itervalues():
+			for arista in v.aristas_ad:
+				w = arista.destino
 				if(self.cantCaminos[w]!=0):
 					v.indice += (v.cantVecesUsado[w] / self.cantCaminos[w])
 		
@@ -188,11 +192,11 @@ class Grafo (object):
 			self.sumPadre(cola)
 			self.procesarIndice()
 			#DEBUG
-			for w in self.dicc_nodos.itervalues():
-				self.cantTotalCaminosPasantesEn[w]+=w.cantTotalVecesUsado
+			#for w in self.dicc_nodos.itervalues():
+				#self.cantTotalCaminosPasantesEn[w]+=w.cantTotalVecesUsado
 		#DEBUG
-		for w in self.dicc_nodos.itervalues():
-			print w.getLabel()+" caminos : "+str(self.cantTotalCaminosPasantesEn[w])
+		#for w in self.dicc_nodos.itervalues():
+			#print w.getLabel()+" caminos : "+str(self.cantTotalCaminosPasantesEn[w])
 		return self.dicc_nodos.values()
 	
 	"""###############################################################"""
@@ -239,14 +243,6 @@ class Grafo (object):
 				masRecomendado = (recomendacion, contAux)
 		return masRecomendado
 
-def ordenarPorLayer(nodo1, nodo2):
-	if len(nodo1.layer) < len(nodo2.layer):
-		return 1
-	elif len(nodo1.layer) == len(nodo2.layer):
-		return 0
-	else:
-		return -1
-
 def comp(nodo1, nodo2):
 	if len(nodo1.aristas_ad) < len(nodo2.aristas_ad):
 		return 1
@@ -261,14 +257,14 @@ def masPopular(grafo):
 	l.sort(comp)
 	return l
 	
-""" devuelve el nodo que tiene mas caminos minimos que pasan por el que el resto"""
+""" devuelve el nodo que tiene mas I con I el numero resultante de la operacion
+matematica descripta en el enunciado del trabajo practico"""
 def masInfluyente(grafo):	
 	lista = grafo.calcularTodosLosIndices()
 	nodoMasInfluyente=Nodo("nadie","nadie")
 	for nodo in lista:
 		#DEBUG
-		print nodo.getLabel()+": "+str(nodo.indice)
-		
+		#print nodo.getLabel()+": "+str(nodo.indice)
 		if(nodoMasInfluyente.indice < nodo.indice):
 			nodoMasInfluyente = nodo
 	return nodoMasInfluyente

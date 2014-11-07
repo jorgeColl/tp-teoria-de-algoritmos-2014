@@ -148,16 +148,20 @@ class Test(unittest.TestCase):
         self.assertEqual(pepe.cantVecesUsado[tomas], 1)
         self.assertEqual(luis.cantVecesUsado[tomas], 1)
         self.assertEqual(luis.cantVecesUsado[juan], 1)
-    """
+    
     def testCalcularTodosLosIndices1(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
         lista = red.calcularTodosLosIndices()
-    
+        for v in lista:
+            print v.getLabel()+" I: "+str(v.indice)
+        print""
+        
     def testCalcularTodosLosIndices2(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         lista = red.calcularTodosLosIndices()
         for v in lista:
             print v.getLabel()+" I: "+str(v.indice)
+        print""
     
     def testMasInfluyente1(self):
         red = main.cargarRedDesdeArchivo("amigosPrueba2.gdf")
@@ -168,7 +172,6 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPrueba3.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "LUIS")
-    """
     
     def testMasInfluyente3(self):
         #este test corrobora lo que mandaron por mail del resultado del ejercicio de ejemplo en
@@ -176,8 +179,6 @@ class Test(unittest.TestCase):
         red = main.cargarRedDesdeArchivo("amigosPruebaEnunciadoTp.gdf")
         nodoMasInfluyente = masInfluyente(red)
         self.assertEqual(nodoMasInfluyente.getLabel(), "Juana")
-        print "Total caminos: "+str(red.cantTotalCaminosMinimos)
-        
         """
         segun el mail, los caminos minimos son:
         En total hay 132 caminos minimos
