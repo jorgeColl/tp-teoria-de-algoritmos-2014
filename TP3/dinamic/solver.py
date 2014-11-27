@@ -72,6 +72,10 @@ class Solver(object):
             
             if (sinTarea >= conTarea or self.Matrix[a - 1][v] == self.Matrix[a][v]):
                 """no es tarea optima"""
+                if(self.Matrix[a - 1][v] == self.Matrix[a][v]):
+                    """ esto soluciona un problema si hay simetria en la solucion """
+                    while(self.Matrix[a-1][v] == self.Matrix[a-1][v-1] and v!=0):
+                        v-=1
                 a -= 1
             else:
                 """es tarea optima"""
