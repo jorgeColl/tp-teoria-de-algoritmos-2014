@@ -1,7 +1,6 @@
 '''
 Created on 23/11/2014
-
-@author: jorge
+@author: jorge y matias y andres
 '''
 from dinamic.solver import Solver
 def parse (nombreArchivo):
